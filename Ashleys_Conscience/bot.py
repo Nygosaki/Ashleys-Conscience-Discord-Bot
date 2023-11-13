@@ -25,7 +25,7 @@ async def cmd_echo(ctx: lightbulb.SlashContext) -> None:
     if "uwu_" == str(ctx.author).lower():
         await ctx.respond("Your thoughts are my thoughts, babe", flags=hikari.MessageFlag.EPHEMERAL)
         await bot.rest.create_message(ctx.channel_id, ctx.options.text)
-    elif  ("cock" in ctx.options.text.lower()) or ("dick" in ctx.options.text.lower()) or "penis" in ctx.options.text.lower() or "anal" in ctx.options.text.lower() or "sex" in ctx.options.text.lower() or "gex" in ctx.options.text.lower():
+    elif  ("cock" in ctx.options.text.lower()) or ("dick" in ctx.options.text.lower()) or "penis" in ctx.options.text.lower() or "anal" in ctx.options.text.lower() or "sex" in ctx.options.text.lower() or "gex" in ctx.options.text.lower() or "cheating" in ctx.options.text.lower():
         await ctx.respond(f"Did you just try to make me cheat on my gf >:(")
     else:
         if "love" in ctx.options.text.lower():
@@ -61,14 +61,19 @@ async def cmd_inspiration(ctx: lightbulb.SlashContext) -> None:
 
 @bot.listen()
 async def messageLog(event: hikari.GuildMessageCreateEvent) -> None:
-    words = event.message.split()
-    user = event.author
+    words = str(event.message.content).split()
+    user = str(event.message.author).lower()
+    if user == "ashely's conscience#6213" and "word" in str(event.message.content).lower():
+        return
 
     with open("db.json", 'r') as file:
         db = json.load(file)
     file.close()
 
     for i in words:
+        i = i.lower()
+        if len(i) > 11:
+            continue
         try:
             if db[user]:
                 try:
@@ -77,10 +82,37 @@ async def messageLog(event: hikari.GuildMessageCreateEvent) -> None:
                     db[user][i] = 1
         except KeyError:
                 db[user] = {i: 1}
-                
+
     with open("db.json", 'w') as file:
         json.dump(db, file)
     file.close()
+
+@bot.command()
+@lightbulb.option("user", "Who do you want me to snitch on? :3", required=True)
+@lightbulb.command("word-count", "See who said what :3")
+@lightbulb.implements(lightbulb.SlashCommand)
+async def cmd_word_count(ctx: lightbulb.SlashContext) -> None:
+    try:
+        with open("db.json", 'r') as file:
+            db = json.load(file)
+        userWords = sorted(db[str(ctx.options.user).lower()].items(), key=lambda x:x[1], reverse=True)
+        file.close()
+        def encodeWords(userWords):
+            out = "```\n+------------+--------+\n| Word       | Amount |\n+------------+--------+\n"
+            flag = 0
+            for i in userWords:
+                flag += 1
+                out += f"| {str(i[0]).ljust(11)}| {str(i[1]).ljust(7)}|\n"
+                if flag == 10:
+                    break
+            out += f"+------------+--------+```"
+            return out
+        embed = hikari.Embed(title=f"What has come out of {ctx.options.user}'s mouth?", description=encodeWords(userWords))
+        embed.set_footer("Please know that only messages sent while the bot is online are considered")
+        await ctx.respond(embed=embed)
+    except:
+        await ctx.respond(f"{str(ctx.options.user)} is not a tracked user, or has not said enough words", flags=hikari.MessageFlag.EPHEMERAL)
+    
 
 
 def run() -> None:
