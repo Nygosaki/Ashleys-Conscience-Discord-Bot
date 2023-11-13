@@ -3,6 +3,9 @@ import hikari
 import lightbulb
 import requests
 import json
+import dotenv
+
+dotenv.load_dotenv()
 
 bot = lightbulb.BotApp(
     token=os.environ["TOKEN"],
@@ -19,7 +22,7 @@ async def on_error(event: lightbulb.CommandErrorEvent) -> None:
 
 @bot.command()
 @lightbulb.option("text", "The thing in my mouth :3", required=True)
-@lightbulb.command("echo", "force words (or cock) into my mouth :3")
+@lightbulb.command("echo", "force words into my mouth :3")
 @lightbulb.implements(lightbulb.SlashCommand)
 async def cmd_echo(ctx: lightbulb.SlashContext) -> None:
     if "uwu_" == str(ctx.author).lower():
@@ -61,6 +64,8 @@ async def cmd_inspiration(ctx: lightbulb.SlashContext) -> None:
 
 @bot.listen()
 async def messageLog(event: hikari.GuildMessageCreateEvent) -> None:
+    sentence = event.message.content
+    
     words = str(event.message.content).split()
     user = str(event.message.author).lower()
     if user == "ashely's conscience#6213" and "word" in str(event.message.content).lower():
@@ -73,7 +78,7 @@ async def messageLog(event: hikari.GuildMessageCreateEvent) -> None:
     for i in words:
         i = i.lower()
         if len(i) > 11:
-            continue
+            break
         try:
             if db[user]:
                 try:
@@ -86,6 +91,17 @@ async def messageLog(event: hikari.GuildMessageCreateEvent) -> None:
     with open("db.json", 'w') as file:
         json.dump(db, file)
     file.close()
+    if "femboy" in sentence or "furry" in sentence:
+        await bot.rest.create_message(event.get_channel(), "O")
+    elif "cute" in sentence:
+        await bot.rest.create_message(event.get_channel(), "And who might that be? :3")
+    elif "milo" in sentence:
+        await bot.rest.create_message(event.get_channel(), "WOOF WOOF")
+    elif "<3" in sentence:
+        await bot.rest.create_message(event.get_channel(), "I love you too Milo :>")
+    elif "antichrist" in sentence:
+        await bot.rest.create_message(event.get_channel(), "I know someoe superior :3")
+    
 
 @bot.command()
 @lightbulb.option("user", "Who do you want me to snitch on? :3", required=True)
@@ -124,3 +140,5 @@ def run() -> None:
         activity=hikari.Activity(
             name="being cute :3", state="because Ashley is the cutest girl alive", type=hikari.ActivityType.COMPETING
         ))
+    
+run()
