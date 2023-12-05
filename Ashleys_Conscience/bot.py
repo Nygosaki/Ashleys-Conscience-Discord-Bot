@@ -272,13 +272,6 @@ async def cmd_word_count(ctx: lightbulb.SlashContext) -> None:
     except:
         await ctx.respond(f"{str(ctx.options.user)} is not a tracked user, or has not said enough words", flags=hikari.MessageFlag.EPHEMERAL)
 
-@bot.command()
-@lightbulb.command("test", "test desc", guilds=(1040093928097054781))
-@lightbulb.implements(lightbulb.SlashCommand)
-async def cmd_test(ctx: lightbulb.SlashContext) -> None:
-    ctx.respond("Watcha doin here? :3")
-
-
 def run() -> None:
     if os.name != "nt":
         import uvloop
