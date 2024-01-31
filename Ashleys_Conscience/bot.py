@@ -11,7 +11,7 @@ import miru
 import time
 from email.message import EmailMessage
 
-dotenv.load_dotenv()
+dotenv.load_dotenv("./.env")
 
 bot = lightbulb.BotApp(
     token=os.environ["TOKEN"],
